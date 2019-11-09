@@ -6,12 +6,17 @@ import lombok.Data;
 @Data
 public class PrdProductInfo {
 
-    private long id;
+  private int id;
+  private String barCode;
     private String productId;
-    private String productCategory;
     private String productName;
+  private String productCategoryOne;
+  private String productCategoryTwo;
     private String productUnit;
     private String description;
+  private int formatColourId;
+  private int formatSizeId;
+  private int formatId;
     private String status;
     private String createBy;
     private String updateBy;

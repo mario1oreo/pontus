@@ -1,27 +1,31 @@
 package com.mario1oreo.projects.business.pontus.dto;
 
+
 import lombok.Data;
 
-import java.time.LocalTime;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Data
 public class PrdVoucherInfo {
 
-  private long id;
+  private int id;
   private String voucherId;
-  private double voucherAmount;
-  private double voucherRealAmount;
-  private String invoiceDemand;
-  private double invoiceRate;
-  private double invoiceAmount;
+  private int voucherType;
+  private BigDecimal voucherAmount;
+  private BigDecimal voucherRealAmount;
+  private int invoiceDemand;
+  private BigDecimal invoiceRate;
+  private BigDecimal invoiceAmount;
   private String invoiceNo;
-  private String transactionType;
-  private LocalTime transactionTime;
+  private int transactionType;
+  private LocalDateTime transactionTime;
   private String productId;
-  private String batchNo;
-  private double productQuantity;
+  private int batchNo;
+  private BigDecimal productQuantity;
   private String channel;
   private String status;
   private String createBy;
   private String updateBy;
+
 }

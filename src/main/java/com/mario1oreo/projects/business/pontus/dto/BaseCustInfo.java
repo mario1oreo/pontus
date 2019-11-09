@@ -4,16 +4,16 @@ package com.mario1oreo.projects.business.pontus.dto;
 import lombok.Data;
 
 @Data
-public class ConfProductType {
+public class BaseCustInfo {
 
-    private long id;
-    private String fullName;
-    private String shortName;
+    private int id;
+    private String custId;
+    private String custName;
+    private String custPhoneNumber;
+    private int custSex;
     private String description;
-    private String configType;
     private String status;
     private String createBy;
     private String updateBy;
-
 
 }

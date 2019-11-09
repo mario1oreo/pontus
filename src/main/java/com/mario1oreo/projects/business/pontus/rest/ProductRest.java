@@ -3,11 +3,11 @@ package com.mario1oreo.projects.business.pontus.rest;
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.RandomUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.mario1oreo.projects.business.pontus.dao.*;
+import com.mario1oreo.projects.business.pontus.dto.ResultBO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +24,7 @@ import java.util.Map;
  */
 @RestController
 @Slf4j
+@CrossOrigin
 @RequestMapping("product")
 public class ProductRest {
 
@@ -55,7 +55,6 @@ public class ProductRest {
     @Autowired
     ConfProductTypeDao confProductTypeDao;
 
-    @CrossOrigin
     @RequestMapping("/findAll")
     @ResponseBody
     public JSONArray findAll() {
@@ -71,14 +70,12 @@ public class ProductRest {
     }
 
 
-    @CrossOrigin
     @RequestMapping("/insert")
     @ResponseBody
     public String insert() {
         return "succeed";
     }
 
-    @CrossOrigin
     @RequestMapping("/mockExpress")
     @ResponseBody
     public String mockExpress() {
@@ -99,11 +96,11 @@ public class ProductRest {
         return result.toString();
     }
 
-    @CrossOrigin
+
     @RequestMapping("/productConfig")
     @ResponseBody
-    public String productConfig() {
-        JSONObject result = new JSONObject();
+    public ResultBO productConfig() {
+        ResultBO result = new ResultBO();
         long t1 = System.currentTimeMillis();
         List<Map<String, String>> list = confProductTypeDao.findAll();
         long t2 = System.currentTimeMillis();
@@ -111,21 +108,102 @@ public class ProductRest {
         long t3 = System.currentTimeMillis();
         for (Map<String, String> eachRow : list) {
             String type = "select" + eachRow.get("CONFIG_TYPE");
-            if (!result.containsKey( type)) {
+            if (result.getData().getDataSource().size() == 0) {
                 JSONArray typeData = new JSONArray();
                 typeData.add(JSONUtil.parseFromMap(eachRow));
-                result.put(type, typeData);
+                result.getData().setDataSource(typeData);
             } else {
-                result.getJSONArray(type).add(JSONUtil.parseFromMap(eachRow));
+                result.getData().getDataSource().add(JSONUtil.parseFromMap(eachRow));
             }
         }
         long t4 = System.currentTimeMillis();
         log.debug("productConfig deal cost:{}", t4 - t3);
-        result.put("message", "成功");
-        result.put("code", "1");
-        log.debug("productConfig result:{}", result.toStringPretty());
+        result.setMessage("成功");
+        result.setStatus("SUCCESS");
+        log.debug("productConfig result:{}", result.toString());
         log.debug("====>> productConfig END!");
-        return result.toString();
+        return result;
     }
 
+    @RequestMapping("/getSelect")
+    @ResponseBody
+    public JSONArray getSelect() {
+        long t1 = System.currentTimeMillis();
+        long t2 = System.currentTimeMillis();
+        log.debug("getSelect query cost:{}", t2 - t1);
+        long t3 = System.currentTimeMillis();
+        JSONArray selectOptions = new JSONArray();
+        selectOptions.add(JSONUtil.parseObj("{\"disabled\":false,\"label\":\"label1\",\"value\":\"value1\"}"));
+        selectOptions.add(JSONUtil.parseObj("{\"disabled\":false,\"label\":\"label2\",\"value\":\"value2\"}"));
+        selectOptions.add(JSONUtil.parseObj("{\"disabled\":false,\"label\":\"label3\",\"value\":\"value3\"}"));
+        selectOptions.add(JSONUtil.parseObj("{\"disabled\":true,\"label\":\"label4\",\"value\":\"value4\"}"));
+        long t4 = System.currentTimeMillis();
+        log.debug("getSelect deal cost:{}", t4 - t3);
+        log.info("getSelect result:{}", selectOptions.toString());
+        log.debug("====>> getSelect END!");
+        return selectOptions;
+    }
+
+    @RequestMapping("/getDate")
+    @ResponseBody
+    public JSONArray getDate() {
+        long t1 = System.currentTimeMillis();
+        long t2 = System.currentTimeMillis();
+        log.debug("getDate query cost:{}", t2 - t1);
+        long t3 = System.currentTimeMillis();
+        JSONArray selectOptions = new JSONArray();
+        selectOptions.add("2018-01-23");
+//        selectOptions.add("2019-03-12");
+        long t4 = System.currentTimeMillis();
+        log.debug("getDate deal cost:{}", t4 - t3);
+        log.info("getDate result:{}", selectOptions.toString());
+        log.debug("====>> getDate END!");
+        return selectOptions;
+    }
+
+    @RequestMapping(value = "/getGoodInfos")
+    @ResponseBody
+    public JSONObject getGoodInfos(String goodsName, String code, String[] reverseTime, String[] bookName) {
+        long t1 = System.currentTimeMillis();
+        long t2 = System.currentTimeMillis();
+        log.debug("getGoodInfos query cost:{}", t2 - t1);
+        long t3 = System.currentTimeMillis();
+        JSONObject recevieParams = new JSONObject();
+        recevieParams.put("goodsName", goodsName);
+        recevieParams.put("code", code);
+        recevieParams.put("reverseTime", reverseTime);
+        recevieParams.put("bookName", bookName);
+        long t4 = System.currentTimeMillis();
+        log.debug("getGoodInfos deal cost:{}", t4 - t3);
+        log.info("getGoodInfos result:{}", recevieParams.toString());
+        log.debug("====>> getGoodInfos END!");
+        return recevieParams;
+    }
+
+    @RequestMapping("/addGoods")
+    @ResponseBody
+    public JSONObject addGoods() {
+        long t1 = System.currentTimeMillis();
+        long t2 = System.currentTimeMillis();
+        log.debug("addGoods query cost:{}", t2 - t1);
+        long t3 = System.currentTimeMillis();
+        JSONArray selectOptions = new JSONArray();
+        selectOptions.add(JSONUtil.parseObj("{\"disabled\":false,\"label\":\"label1\",\"value\":\"value1\"}"));
+        selectOptions.add(JSONUtil.parseObj("{\"disabled\":false,\"label\":\"label2\",\"value\":\"value2\"}"));
+        selectOptions.add(JSONUtil.parseObj("{\"disabled\":false,\"label\":\"label3\",\"value\":\"value3\"}"));
+        selectOptions.add(JSONUtil.parseObj("{\"disabled\":true,\"label\":\"label4\",\"value\":\"value4\"}"));
+        JSONObject goodInfo = new JSONObject();
+        goodInfo.put("stock", 1);
+        goodInfo.put("options", selectOptions);
+        JSONArray reverseTimeArray = new JSONArray();
+        reverseTimeArray.add(DateUtil.today());
+        goodInfo.put("reverseTime", reverseTimeArray);
+        goodInfo.put("payment", String.valueOf(RandomUtil.randomInt(1, 3)));
+        goodInfo.put("show", String.valueOf(RandomUtil.randomInt(1, 3)));
+        long t4 = System.currentTimeMillis();
+        log.debug("addGoods deal cost:{}", t4 - t3);
+        log.info("addGoods result:{}", goodInfo.toString());
+        log.debug("====>> addGoods END!");
+        return goodInfo;
+    }
 }
