@@ -33,7 +33,7 @@ public class DruidConfig {
     @Value("${spring.datasource.url}")
     private String url;
 
-    @Value("${srping.datasource.username}")
+    @Value("${spring.datasource.username}")
     private String username;
 
     @Value("${spring.datasource.password}")
@@ -127,16 +127,16 @@ public class DruidConfig {
 
     /**
      * 注册一个StatViewServlet
-     * @return
+     * @return ServletRegistrationBean
      */
     @Bean
     public ServletRegistrationBean DruidStatviewServlet(){
         ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean(new StatViewServlet(),"/druid/*");
 
         //添加初始化参数: initParams
-        /** 白名单,如果不配置或者value为空，则允许所有*/
+        //白名单,如果不配置或者value为空，则允许所有
         servletRegistrationBean.addInitParameter("allow","");
-        /** 黑名单，与白名单存在相同IP时，优先于白名单*/
+        // 黑名单，与白名单存在相同IP时，优先于白名单
         servletRegistrationBean.addInitParameter("deny","192.0.0.1");
         //用户名
         servletRegistrationBean.addInitParameter("loginUsername","druid");
@@ -152,7 +152,7 @@ public class DruidConfig {
 
     /**
      * 注册一个: WebStatFilter
-     * @return
+     * @return FilterRegistrationBean
      */
 
     @Bean

@@ -6,7 +6,10 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
-import com.mario1oreo.projects.business.pontus.dao.*;
+import com.mario1oreo.projects.business.pontus.dao.BiInventoryInfoDao;
+import com.mario1oreo.projects.business.pontus.dao.ConfProductCategoryDao;
+import com.mario1oreo.projects.business.pontus.dto.BiInventoryInfoDTO;
+import com.mario1oreo.projects.business.pontus.dto.ConfProductCategoryDTO;
 import com.mario1oreo.projects.business.pontus.dto.ResultBO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +18,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author mario1oreo
@@ -29,36 +33,17 @@ import java.util.Map;
 public class ProductRest {
 
     @Autowired
-    BIIncomeInfoDao biIncomeInfoDao;
+    private BiInventoryInfoDao biInventoryInfoDao;
 
     @Autowired
-    BIInventoryInfoDao biInventoryInfo;
-
-    @Autowired
-    ExpressInfoDao expressInfoDao;
-
-    @Autowired
-    InventoryChangingInfoDao inventoryChangingInfoDao;
-
-    @Autowired
-    InventoryInfoDao inventoryInfoDao;
-
-    @Autowired
-    ProductInfoDao productInfoDao;
-
-    @Autowired
-    ProductPriceInfoDao productPriceInfoDao;
-
-    @Autowired
-    VoucherInfoDao voucherInfoDao;
-
-    @Autowired
-    ConfProductTypeDao confProductTypeDao;
+    private ConfProductCategoryDao confProductCategoryDao;
 
     @RequestMapping("/findAll")
     @ResponseBody
     public JSONArray findAll() {
-        List<Map<String, String>> datas = biInventoryInfo.findAll();
+        int pageNum = 3;
+        int pageSize = 2;
+        List<BiInventoryInfoDTO> datas = biInventoryInfoDao.findByPage((pageNum - 1) * pageSize, pageSize);
         if (datas == null) {
             log.info("datas is null");
         } else {
@@ -73,7 +58,18 @@ public class ProductRest {
     @RequestMapping("/insert")
     @ResponseBody
     public String insert() {
-        return "succeed";
+        BiInventoryInfoDTO bo = new BiInventoryInfoDTO();
+        bo.setPartitionDt(LocalDate.now());
+        bo.setProductId(RandomUtil.randomStringUpper(15));
+        bo.setProductName(RandomUtil.randomStringUpper(10));
+        bo.setProductQuantity(BigDecimal.ONE);
+        bo.setProductUnit("t");
+        bo.setUpdateBy("test");
+        bo.setCreateBy("testinsert");
+        bo.setState("0");
+        int result = biInventoryInfoDao.insert(bo);
+        return String.valueOf(result);
+
     }
 
     @RequestMapping("/mockExpress")
@@ -102,18 +98,18 @@ public class ProductRest {
     public ResultBO productConfig() {
         ResultBO result = new ResultBO();
         long t1 = System.currentTimeMillis();
-        List<Map<String, String>> list = confProductTypeDao.findAll();
+        List<ConfProductCategoryDTO> list = confProductCategoryDao.findAll();
         long t2 = System.currentTimeMillis();
         log.debug("productConfig query cost:{}", t2 - t1);
         long t3 = System.currentTimeMillis();
-        for (Map<String, String> eachRow : list) {
-            String type = "select" + eachRow.get("CONFIG_TYPE");
+        for (ConfProductCategoryDTO eachRow : list) {
+            String type = "select" + eachRow.getProductCategoryLevel();
             if (result.getData().getDataSource().size() == 0) {
                 JSONArray typeData = new JSONArray();
-                typeData.add(JSONUtil.parseFromMap(eachRow));
+                typeData.add(JSONUtil.parseObj(eachRow));
                 result.getData().setDataSource(typeData);
             } else {
-                result.getData().getDataSource().add(JSONUtil.parseFromMap(eachRow));
+                result.getData().getDataSource().add(JSONUtil.parseObj(eachRow));
             }
         }
         long t4 = System.currentTimeMillis();
