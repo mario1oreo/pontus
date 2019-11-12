@@ -6,21 +6,20 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
-import com.mario1oreo.projects.business.pontus.dao.BiInventoryInfoDao;
-import com.mario1oreo.projects.business.pontus.dao.ConfProductCategoryDao;
-import com.mario1oreo.projects.business.pontus.dto.BiInventoryInfoDTO;
-import com.mario1oreo.projects.business.pontus.dto.ConfProductCategoryDTO;
-import com.mario1oreo.projects.business.pontus.dto.ResultBO;
+import com.mario1oreo.projects.business.pontus.dao.*;
+import com.mario1oreo.projects.business.pontus.dto.*;
+import com.mario1oreo.projects.business.pontus.utils.tools.CreateDateDim;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author mario1oreo
@@ -32,11 +31,26 @@ import java.util.List;
 @RequestMapping("product")
 public class ProductRest {
 
-    @Autowired
+    @Resource
     private BiInventoryInfoDao biInventoryInfoDao;
 
-    @Autowired
+    @Resource
     private ConfProductCategoryDao confProductCategoryDao;
+
+    @Resource
+    private ConfProductColourDao confProductColourDao;
+
+    @Resource
+    private ConfProductFormatDao confProductFormatDao;
+
+    @Resource
+    private ConfProductSizeDao confProductSizeDao;
+
+    @Resource
+    private DimDateDao dimDateDao;
+
+    @Resource
+    private DimTimeDao dimTimeDao;
 
     @RequestMapping("/findAll")
     @ResponseBody
@@ -157,49 +171,133 @@ public class ProductRest {
         return selectOptions;
     }
 
-    @RequestMapping(value = "/getGoodInfos")
+
+    @RequestMapping(value = "/addGoodsInfo")
     @ResponseBody
-    public JSONObject getGoodInfos(String goodsName, String code, String[] reverseTime, String[] bookName) {
+    public JSONObject addGoodsInfo(String barCode, String productName, int productQuantity, BigDecimal salePrice, String optionsColor, String optionsFormat, String optionsLevel1, String optionsLevel2, String optionsSize) {
         long t1 = System.currentTimeMillis();
         long t2 = System.currentTimeMillis();
-        log.debug("getGoodInfos query cost:{}", t2 - t1);
+        log.debug("addGoodsInfo query cost:{}", t2 - t1);
         long t3 = System.currentTimeMillis();
-        JSONObject recevieParams = new JSONObject();
-        recevieParams.put("goodsName", goodsName);
-        recevieParams.put("code", code);
-        recevieParams.put("reverseTime", reverseTime);
-        recevieParams.put("bookName", bookName);
+        JSONObject receiveParam = new JSONObject();
+        receiveParam.put("barCode", barCode);
+        receiveParam.put("productName", productName);
+        receiveParam.put("productQuantity", productQuantity);
+        receiveParam.put("salePrice", salePrice);
+        receiveParam.put("optionsColor", optionsColor);
+        receiveParam.put("optionsFormat", optionsFormat);
+        receiveParam.put("optionsLevel1", optionsLevel1);
+        receiveParam.put("optionsLevel2", optionsLevel2);
+        receiveParam.put("optionsSize", optionsSize);
         long t4 = System.currentTimeMillis();
-        log.debug("getGoodInfos deal cost:{}", t4 - t3);
-        log.info("getGoodInfos result:{}", recevieParams.toString());
-        log.debug("====>> getGoodInfos END!");
-        return recevieParams;
+        log.debug("addGoodsInfo deal cost:{}", t4 - t3);
+        log.info("addGoodsInfo result:{}", receiveParam.toString());
+        log.debug("====>> addGoodsInfo END!");
+        return receiveParam;
     }
 
-    @RequestMapping("/addGoods")
+    @RequestMapping("/getGoodsOptions")
     @ResponseBody
-    public JSONObject addGoods() {
-        long t1 = System.currentTimeMillis();
-        long t2 = System.currentTimeMillis();
-        log.debug("addGoods query cost:{}", t2 - t1);
-        long t3 = System.currentTimeMillis();
-        JSONArray selectOptions = new JSONArray();
-        selectOptions.add(JSONUtil.parseObj("{\"disabled\":false,\"label\":\"label1\",\"value\":\"value1\"}"));
-        selectOptions.add(JSONUtil.parseObj("{\"disabled\":false,\"label\":\"label2\",\"value\":\"value2\"}"));
-        selectOptions.add(JSONUtil.parseObj("{\"disabled\":false,\"label\":\"label3\",\"value\":\"value3\"}"));
-        selectOptions.add(JSONUtil.parseObj("{\"disabled\":true,\"label\":\"label4\",\"value\":\"value4\"}"));
-        JSONObject goodInfo = new JSONObject();
-        goodInfo.put("stock", 1);
-        goodInfo.put("options", selectOptions);
-        JSONArray reverseTimeArray = new JSONArray();
-        reverseTimeArray.add(DateUtil.today());
-        goodInfo.put("reverseTime", reverseTimeArray);
-        goodInfo.put("payment", String.valueOf(RandomUtil.randomInt(1, 3)));
-        goodInfo.put("show", String.valueOf(RandomUtil.randomInt(1, 3)));
-        long t4 = System.currentTimeMillis();
-        log.debug("addGoods deal cost:{}", t4 - t3);
-        log.info("addGoods result:{}", goodInfo.toString());
-        log.debug("====>> addGoods END!");
-        return goodInfo;
+    public JSONObject getGoodsOptions() {
+        List<ConfProductCategoryDTO> optionsLevelList = confProductCategoryDao.findAll();
+        JSONArray optionsLevel1 = optionsLevelList.stream().filter(dto -> dto.getProductCategoryLevel() == 1).map(dto -> {
+            JSONObject option = new JSONObject();
+            option.put("label", dto.getProductCategoryName());
+            option.put("value", dto.getProductCategoryId());
+            option.put("disable", "0".equals(dto.getState()));
+            return option;
+        }).collect(Collectors.toCollection(JSONArray::new));
+
+        JSONArray optionsLevel2 = optionsLevelList.stream().filter(dto -> dto.getProductCategoryLevel() == 2).map(dto -> {
+            JSONObject option = new JSONObject();
+            option.put("label", dto.getProductCategoryName());
+            option.put("value", dto.getProductCategoryId());
+            option.put("disable", "0".equals(dto.getState()));
+            return option;
+        }).collect(Collectors.toCollection(JSONArray::new));
+
+        List<ConfProductColourDTO> optionsColorList = confProductColourDao.findAll();
+        JSONArray optionsColor = optionsColorList.stream().map(dto -> {
+            JSONObject option = new JSONObject();
+            option.put("label", dto.getFormatColourName());
+            option.put("value", dto.getFormatColourId());
+            option.put("disable", "0".equals(dto.getState()));
+            return option;
+        }).collect(Collectors.toCollection(JSONArray::new));
+
+        List<ConfProductFormatDTO> optionsFormatList = confProductFormatDao.findAll();
+        JSONArray optionsFormat = optionsFormatList.stream().map(dto -> {
+            JSONObject option = new JSONObject();
+            option.put("label", dto.getFormatCode());
+            option.put("value", dto.getFormatId());
+            option.put("disable", "0".equals(dto.getState()));
+            return option;
+        }).collect(Collectors.toCollection(JSONArray::new));
+
+        List<ConfProductSizeDTO> optionsSizeList = confProductSizeDao.findAll();
+        JSONArray optionsSize = optionsSizeList.stream().map(dto -> {
+            JSONObject option = new JSONObject();
+            option.put("label", dto.getFormatSizeCode());
+            option.put("value", dto.getFormatSizeId());
+            option.put("disable", "0".equals(dto.getState()));
+            return option;
+        }).collect(Collectors.toCollection(JSONArray::new));
+
+        JSONObject result = new JSONObject();
+        result.put("optionsLevel1", optionsLevel1);
+        result.put("optionsLevel2", optionsLevel2);
+        result.put("optionsColor", optionsColor);
+        result.put("optionsFormat", optionsFormat);
+        result.put("optionsSize", optionsSize);
+        result.put("productQuantity", 0);
+        log.info("getGoodsOptions result:{}", result.toString());
+        return result;
     }
+
+    @RequestMapping("/initDimDate")
+    @ResponseBody
+    public JSONObject initDimDate() {
+        JSONObject result = new JSONObject();
+        String startDate = "1990-01-01";
+        String endDate = "2049-12-31";
+        JSONArray dateArr = CreateDateDim.generDate(startDate, endDate, DateField.DAY_OF_YEAR);
+        int countSucceed = 0;
+        long preTime = System.currentTimeMillis();
+        for (int i = 0; i < dateArr.size(); i++) {
+            DimDateDTO dto = dateArr.getJSONObject(i).toBean(DimDateDTO.class);
+            if (i % 1000 == 0) {
+                log.info("第{}条记录开始插入! dto:{}", i, dto.toString());
+            }
+            countSucceed += dimDateDao.insert(dto);
+        }
+        log.info("insert spend time :{}ms", DateUtil.spendMs(preTime));
+        result.put("dataArr.size", dateArr.size());
+        log.info("dataArr.size : {}", dateArr.size());
+        result.put("countSucceed", countSucceed);
+        log.info("countSucceed : {}", countSucceed);
+        return result;
+    }
+
+    @RequestMapping("/initDimTime")
+    @ResponseBody
+    public JSONObject initDimTime() {
+        JSONObject result = new JSONObject();
+        JSONArray dateArr = CreateDateDim.generTime();
+        int countSucceed = 0;
+        long preTime = System.currentTimeMillis();
+        for (int i = 0; i < dateArr.size(); i++) {
+            DimTimeDTO dto = dateArr.getJSONObject(i).toBean(DimTimeDTO.class);
+            if (i % 1000 == 0) {
+                log.info("第{}条记录开始插入! dto:{}", i, dto.toString());
+            }
+            countSucceed += dimTimeDao.insert(dto);
+        }
+        log.info("insert spend time :{}ms", DateUtil.spendMs(preTime));
+        result.put("dataArr.size", dateArr.size());
+        log.info("dataArr.size : {}", dateArr.size());
+        result.put("countSucceed", countSucceed);
+        log.info("countSucceed : {}", countSucceed);
+        return result;
+    }
+
 }

@@ -1,14 +1,17 @@
 package com.mario1oreo.projects.business.pontus.dto;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * @author mario1oreo
- * @date 2019-11-10
+ *
+ * @date 2019-11-13
  */
 
+@EqualsAndHashCode(callSuper = false)
 @Data
-public class BiIncomeInfoDTO {
+public class BiIncomeInfoDTO extends BaseDTO {
 
     /**
      * ID
@@ -50,25 +53,5 @@ public class BiIncomeInfoDTO {
      * 日期分区
      */
     private java.time.LocalDate partitionDt;
-    /**
-     * 状态：0：正常   1：作废
-     */
-    private String state;
-    /**
-     * 创建时间
-     */
-    private java.time.LocalDateTime createTime;
-    /**
-     * 创建者
-     */
-    private String createBy;
-    /**
-     * 更新时间
-     */
-    private java.time.LocalDateTime updateTime;
-    /**
-     * 更新者
-     */
-    private String updateBy;
 
 }

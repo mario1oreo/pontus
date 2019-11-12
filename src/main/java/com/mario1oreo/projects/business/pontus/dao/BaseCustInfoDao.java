@@ -8,7 +8,9 @@ import java.util.List;
 
 /**
  * @author mario1oreo
- * @date 2019-11-10
+ *
+ * @date 2019-11-13
+ *
  */
 @Mapper
 public interface BaseCustInfoDao {
