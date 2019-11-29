@@ -6,7 +6,7 @@ import lombok.EqualsAndHashCode;
 /**
  * @author mario1oreo
  *
- * @date 2019-11-13
+ * @date 2019-11-18
  */
 
 @EqualsAndHashCode(callSuper = false)
@@ -16,22 +16,26 @@ public class ConfProductCategoryDTO extends BaseDTO {
 	/**
 	 * ID
 	 */
-	private int id;
+    private int id;
 	/**
 	 * 产品类别ID
 	 */
-	private String productCategoryId;
+    private String productCategoryId;
 	/**
 	 * 产品类别编码
 	 */
-	private String productCategoryCode;
+    private String productCategoryCode;
 	/**
 	 * 产品类别名称
 	 */
-	private String productCategoryName;
+    private String productCategoryName;
 	/**
 	 * 产品类别级别 1 2 3
 	 */
-	private int productCategoryLevel;
+    private int productCategoryLevel;
+    /**
+     * 产品类别信息备注说明
+     */
+    private String productCategoryMemo;
 
 }

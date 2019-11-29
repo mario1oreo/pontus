@@ -9,19 +9,18 @@ import java.util.List;
 /**
  * @author mario1oreo
  *
- * @date 2019-11-13
+ * @date 2019-11-20
  *
  */
 @Mapper
 public interface PrdInventoryInfoDao {
 
 
-    @Select("SELECT  ID, PRODUCT_ID, BATCH_NO, PRODUCT_NAME, PRODUCT_UNIT, PRODUCT_QUANTITY, STATE, CREATE_TIME, CREATE_BY, UPDATE_TIME, UPDATE_BY FROM PRD_INVENTORY_INFO")
+    @Select("SELECT  ID, PRODUCT_ID, BATCH_NO, PRODUCT_UNIT, PRODUCT_QUANTITY, STATE, CREATE_TIME, CREATE_BY, UPDATE_TIME, UPDATE_BY FROM PRD_INVENTORY_INFO")
     @Results({
             @Result(column = "ID", property = "id"),
             @Result(column = "PRODUCT_ID", property = "productId"),
             @Result(column = "BATCH_NO", property = "batchNo"),
-            @Result(column = "PRODUCT_NAME", property = "productName"),
             @Result(column = "PRODUCT_UNIT", property = "productUnit"),
             @Result(column = "PRODUCT_QUANTITY", property = "productQuantity"),
             @Result(column = "STATE", property = "state"),
@@ -30,12 +29,11 @@ public interface PrdInventoryInfoDao {
     })
     List<PrdInventoryInfoDTO> findAll();
 
-    @Select("SELECT  ID, PRODUCT_ID, BATCH_NO, PRODUCT_NAME, PRODUCT_UNIT, PRODUCT_QUANTITY, STATE, CREATE_TIME, CREATE_BY, UPDATE_TIME, UPDATE_BY FROM PRD_INVENTORY_INFO LIMIT #{startNum},#{pageSize}")
+    @Select("SELECT  ID, PRODUCT_ID, BATCH_NO, PRODUCT_UNIT, PRODUCT_QUANTITY, STATE, CREATE_TIME, CREATE_BY, UPDATE_TIME, UPDATE_BY FROM PRD_INVENTORY_INFO LIMIT #{startNum},#{pageSize}")
     @Results({
             @Result(column = "ID", property = "id"),
             @Result(column = "PRODUCT_ID", property = "productId"),
             @Result(column = "BATCH_NO", property = "batchNo"),
-            @Result(column = "PRODUCT_NAME", property = "productName"),
             @Result(column = "PRODUCT_UNIT", property = "productUnit"),
             @Result(column = "PRODUCT_QUANTITY", property = "productQuantity"),
             @Result(column = "STATE", property = "state"),
@@ -44,8 +42,8 @@ public interface PrdInventoryInfoDao {
     })
     List<PrdInventoryInfoDTO> findByPage(@Param("startNum") int startNum, @Param("pageSize") int pageSize);
 
-    @Insert("INSERT INTO PRD_INVENTORY_INFO( ID, PRODUCT_ID, BATCH_NO, PRODUCT_NAME, PRODUCT_UNIT, PRODUCT_QUANTITY, STATE, CREATE_TIME, CREATE_BY, UPDATE_TIME, UPDATE_BY) " +
-            "VALUES(#{id}, #{productId}, #{batchNo}, #{productName}, #{productUnit}, #{productQuantity}, #{state}, #{createTime}, #{createBy}, #{updateTime}, #{updateBy})")
+    @Insert("INSERT INTO PRD_INVENTORY_INFO( ID, PRODUCT_ID, BATCH_NO, PRODUCT_UNIT, PRODUCT_QUANTITY, STATE, CREATE_TIME, CREATE_BY, UPDATE_TIME, UPDATE_BY) " +
+            "VALUES(#{id}, #{productId}, #{batchNo}, #{productUnit}, #{productQuantity}, #{state}, #{createTime}, #{createBy}, #{updateTime}, #{updateBy})")
     int insert(PrdInventoryInfoDTO prdInventoryInfoDTO);
 
 }

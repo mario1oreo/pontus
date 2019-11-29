@@ -6,7 +6,7 @@ import lombok.EqualsAndHashCode;
 /**
  * @author mario1oreo
  *
- * @date 2019-11-13
+ * @date 2019-11-20
  */
 
 @EqualsAndHashCode(callSuper = false)
@@ -29,10 +29,6 @@ public class PrdInventoryChangingInfoDTO extends BaseDTO {
      * 商品批次号
      */
     private int batchNo;
-    /**
-     * 商品名称
-     */
-    private String productName;
     /**
      * 产品规格单位
      */

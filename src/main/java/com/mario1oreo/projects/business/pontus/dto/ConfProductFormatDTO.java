@@ -6,7 +6,7 @@ import lombok.EqualsAndHashCode;
 /**
  * @author mario1oreo
  *
- * @date 2019-11-13
+ * @date 2019-11-18
  */
 
 @EqualsAndHashCode(callSuper = false)
@@ -41,5 +41,9 @@ public class ConfProductFormatDTO extends BaseDTO {
      * 规格重量,单位:克 g
      */
     private int formatWeight;
+    /**
+     * 规格信息备注说明
+     */
+    private String formatMemo;
 
 }

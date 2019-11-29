@@ -6,14 +6,15 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
-import com.mario1oreo.projects.business.pontus.dao.*;
+import com.mario1oreo.projects.business.pontus.dao.BiInventoryInfoDao;
 import com.mario1oreo.projects.business.pontus.dto.*;
+import com.mario1oreo.projects.business.pontus.service.ConfigInfoService;
+import com.mario1oreo.projects.business.pontus.service.DimensionInfoService;
+import com.mario1oreo.projects.business.pontus.service.ProductInfoService;
+import com.mario1oreo.projects.business.pontus.utils.tools.CreateBarCode;
 import com.mario1oreo.projects.business.pontus.utils.tools.CreateDateDim;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -35,22 +36,13 @@ public class ProductRest {
     private BiInventoryInfoDao biInventoryInfoDao;
 
     @Resource
-    private ConfProductCategoryDao confProductCategoryDao;
+    DimensionInfoService dimensionInfoServiceImpl;
 
     @Resource
-    private ConfProductColourDao confProductColourDao;
+    ProductInfoService productInfoServiceImpl;
 
     @Resource
-    private ConfProductFormatDao confProductFormatDao;
-
-    @Resource
-    private ConfProductSizeDao confProductSizeDao;
-
-    @Resource
-    private DimDateDao dimDateDao;
-
-    @Resource
-    private DimTimeDao dimTimeDao;
+    ConfigInfoService configInfoServiceImpl;
 
     @RequestMapping("/findAll")
     @ResponseBody
@@ -112,7 +104,7 @@ public class ProductRest {
     public ResultBO productConfig() {
         ResultBO result = new ResultBO();
         long t1 = System.currentTimeMillis();
-        List<ConfProductCategoryDTO> list = confProductCategoryDao.findAll();
+        List<ConfProductCategoryDTO> list = configInfoServiceImpl.findAllCategoryInfo();
         long t2 = System.currentTimeMillis();
         log.debug("productConfig query cost:{}", t2 - t1);
         long t3 = System.currentTimeMillis();
@@ -174,23 +166,18 @@ public class ProductRest {
 
     @RequestMapping(value = "/addGoodsInfo")
     @ResponseBody
-    public JSONObject addGoodsInfo(String barCode, String productName, int productQuantity, BigDecimal salePrice, String optionsColor, String optionsFormat, String optionsLevel1, String optionsLevel2, String optionsSize) {
-        long t1 = System.currentTimeMillis();
-        long t2 = System.currentTimeMillis();
-        log.debug("addGoodsInfo query cost:{}", t2 - t1);
-        long t3 = System.currentTimeMillis();
+    public JSONObject addGoodsInfo(AddGoodsBO addGoodsBO) {
+        log.info("entry addGoodsInfo");
         JSONObject receiveParam = new JSONObject();
-        receiveParam.put("barCode", barCode);
-        receiveParam.put("productName", productName);
-        receiveParam.put("productQuantity", productQuantity);
-        receiveParam.put("salePrice", salePrice);
-        receiveParam.put("optionsColor", optionsColor);
-        receiveParam.put("optionsFormat", optionsFormat);
-        receiveParam.put("optionsLevel1", optionsLevel1);
-        receiveParam.put("optionsLevel2", optionsLevel2);
-        receiveParam.put("optionsSize", optionsSize);
-        long t4 = System.currentTimeMillis();
-        log.debug("addGoodsInfo deal cost:{}", t4 - t3);
+        if (addGoodsBO == null) {
+            log.error("addGoodsBO is null! ");
+            receiveParam.put("status", false);
+            receiveParam.put("message", "接收到的参数为空对象，请联系管理员查看服务器状态！！");
+            return receiveParam;
+        }
+
+        receiveParam = productInfoServiceImpl.addGoodsInfo(addGoodsBO);
+
         log.info("addGoodsInfo result:{}", receiveParam.toString());
         log.debug("====>> addGoodsInfo END!");
         return receiveParam;
@@ -199,7 +186,7 @@ public class ProductRest {
     @RequestMapping("/getGoodsOptions")
     @ResponseBody
     public JSONObject getGoodsOptions() {
-        List<ConfProductCategoryDTO> optionsLevelList = confProductCategoryDao.findAll();
+        List<ConfProductCategoryDTO> optionsLevelList = configInfoServiceImpl.findAllCategoryInfo();
         JSONArray optionsLevel1 = optionsLevelList.stream().filter(dto -> dto.getProductCategoryLevel() == 1).map(dto -> {
             JSONObject option = new JSONObject();
             option.put("label", dto.getProductCategoryName());
@@ -216,7 +203,15 @@ public class ProductRest {
             return option;
         }).collect(Collectors.toCollection(JSONArray::new));
 
-        List<ConfProductColourDTO> optionsColorList = confProductColourDao.findAll();
+        JSONArray optionsLevel3 = optionsLevelList.stream().filter(dto -> dto.getProductCategoryLevel() == 3).map(dto -> {
+            JSONObject option = new JSONObject();
+            option.put("label", dto.getProductCategoryName());
+            option.put("value", dto.getProductCategoryId());
+            option.put("disable", "0".equals(dto.getState()));
+            return option;
+        }).collect(Collectors.toCollection(JSONArray::new));
+
+        List<ConfProductColourDTO> optionsColorList = configInfoServiceImpl.findAllColourInfo();
         JSONArray optionsColor = optionsColorList.stream().map(dto -> {
             JSONObject option = new JSONObject();
             option.put("label", dto.getFormatColourName());
@@ -225,7 +220,7 @@ public class ProductRest {
             return option;
         }).collect(Collectors.toCollection(JSONArray::new));
 
-        List<ConfProductFormatDTO> optionsFormatList = confProductFormatDao.findAll();
+        List<ConfProductFormatDTO> optionsFormatList = configInfoServiceImpl.findAllFormatInfo();
         JSONArray optionsFormat = optionsFormatList.stream().map(dto -> {
             JSONObject option = new JSONObject();
             option.put("label", dto.getFormatCode());
@@ -234,7 +229,7 @@ public class ProductRest {
             return option;
         }).collect(Collectors.toCollection(JSONArray::new));
 
-        List<ConfProductSizeDTO> optionsSizeList = confProductSizeDao.findAll();
+        List<ConfProductSizeDTO> optionsSizeList = configInfoServiceImpl.findAllSizeInfo();
         JSONArray optionsSize = optionsSizeList.stream().map(dto -> {
             JSONObject option = new JSONObject();
             option.put("label", dto.getFormatSizeCode());
@@ -243,9 +238,12 @@ public class ProductRest {
             return option;
         }).collect(Collectors.toCollection(JSONArray::new));
 
+        ConfBarCodeDTO confBarCodeDTO = configInfoServiceImpl.findUnUseOneBarCode();
         JSONObject result = new JSONObject();
+        result.put("barCode", confBarCodeDTO.getBarCode());
         result.put("optionsLevel1", optionsLevel1);
         result.put("optionsLevel2", optionsLevel2);
+        result.put("optionsLevel3", optionsLevel3);
         result.put("optionsColor", optionsColor);
         result.put("optionsFormat", optionsFormat);
         result.put("optionsSize", optionsSize);
@@ -268,7 +266,7 @@ public class ProductRest {
             if (i % 1000 == 0) {
                 log.info("第{}条记录开始插入! dto:{}", i, dto.toString());
             }
-            countSucceed += dimDateDao.insert(dto);
+            countSucceed += dimensionInfoServiceImpl.addDimDate(dto);
         }
         log.info("insert spend time :{}ms", DateUtil.spendMs(preTime));
         result.put("dataArr.size", dateArr.size());
@@ -290,7 +288,7 @@ public class ProductRest {
             if (i % 1000 == 0) {
                 log.info("第{}条记录开始插入! dto:{}", i, dto.toString());
             }
-            countSucceed += dimTimeDao.insert(dto);
+            countSucceed += dimensionInfoServiceImpl.addDimTime(dto);
         }
         log.info("insert spend time :{}ms", DateUtil.spendMs(preTime));
         result.put("dataArr.size", dateArr.size());
@@ -300,4 +298,31 @@ public class ProductRest {
         return result;
     }
 
+    @RequestMapping("/initBarCode")
+    @ResponseBody
+    public JSONObject initBarCode() {
+        JSONObject result = new JSONObject();
+        List<String> codeList = CreateBarCode.generBarCode("697285707", 0, 999);
+        int countSucceed = 0;
+        long preTime = System.currentTimeMillis();
+        for (String code : codeList) {
+            ConfBarCodeDTO dto = new ConfBarCodeDTO();
+            dto.setBarCode(code);
+            countSucceed += configInfoServiceImpl.addBarCodeInfo(dto);
+        }
+        log.info("insert spend time :{}ms", DateUtil.spendMs(preTime));
+        result.put("codeList.size", codeList.size());
+        log.info("codeList.size : {}", codeList.size());
+        result.put("countSucceed", countSucceed);
+        log.info("countSucceed : {}", countSucceed);
+        return result;
+    }
+
+
+    @RequestMapping("/queryGoodsInfoList")
+    @ResponseBody
+    public JSONArray queryGoodsInfoList(@RequestParam(defaultValue = "0") int current, @RequestParam(defaultValue = "10") int pageSize) {
+        log.info("queryGoodsInfoList currentPageNum:{}  pageSize:{}", current, pageSize);
+        return productInfoServiceImpl.listGoodsInfo(current, pageSize);
+    }
 }

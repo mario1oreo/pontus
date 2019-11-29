@@ -9,14 +9,14 @@ import java.util.List;
 /**
  * @author mario1oreo
  *
- * @date 2019-11-13
+ * @date 2019-11-18
  *
  */
 @Mapper
 public interface ConfProductFormatDao {
 
 
-    @Select("SELECT  ID, FORMAT_ID, FORMAT_CODE, FORMAT_LENGTH, FORMAT_WIDTH, FORMAT_HEIGHT, FORMAT_WEIGHT, STATE, CREATE_TIME, CREATE_BY, UPDATE_TIME, UPDATE_BY FROM CONF_PRODUCT_FORMAT")
+    @Select("SELECT  ID, FORMAT_ID, FORMAT_CODE, FORMAT_LENGTH, FORMAT_WIDTH, FORMAT_HEIGHT, FORMAT_WEIGHT, FORMAT_MEMO, STATE, CREATE_TIME, CREATE_BY, UPDATE_TIME, UPDATE_BY FROM CONF_PRODUCT_FORMAT")
     @Results({
             @Result(column = "ID", property = "id"),
             @Result(column = "FORMAT_ID", property = "formatId"),
@@ -25,13 +25,14 @@ public interface ConfProductFormatDao {
             @Result(column = "FORMAT_WIDTH", property = "formatWidth"),
             @Result(column = "FORMAT_HEIGHT", property = "formatHeight"),
             @Result(column = "FORMAT_WEIGHT", property = "formatWeight"),
+            @Result(column = "FORMAT_MEMO", property = "formatMemo"),
             @Result(column = "STATE", property = "state"),
             @Result(column = "CREATE_BY", property = "createBy"),
             @Result(column = "UPDATE_BY", property = "updateBy")
     })
     List<ConfProductFormatDTO> findAll();
 
-    @Select("SELECT  ID, FORMAT_ID, FORMAT_CODE, FORMAT_LENGTH, FORMAT_WIDTH, FORMAT_HEIGHT, FORMAT_WEIGHT, STATE, CREATE_TIME, CREATE_BY, UPDATE_TIME, UPDATE_BY FROM CONF_PRODUCT_FORMAT LIMIT #{startNum},#{pageSize}")
+    @Select("SELECT  ID, FORMAT_ID, FORMAT_CODE, FORMAT_LENGTH, FORMAT_WIDTH, FORMAT_HEIGHT, FORMAT_WEIGHT, FORMAT_MEMO, STATE, CREATE_TIME, CREATE_BY, UPDATE_TIME, UPDATE_BY FROM CONF_PRODUCT_FORMAT LIMIT #{startNum},#{pageSize}")
     @Results({
             @Result(column = "ID", property = "id"),
             @Result(column = "FORMAT_ID", property = "formatId"),
@@ -40,14 +41,18 @@ public interface ConfProductFormatDao {
             @Result(column = "FORMAT_WIDTH", property = "formatWidth"),
             @Result(column = "FORMAT_HEIGHT", property = "formatHeight"),
             @Result(column = "FORMAT_WEIGHT", property = "formatWeight"),
+            @Result(column = "FORMAT_MEMO", property = "formatMemo"),
             @Result(column = "STATE", property = "state"),
             @Result(column = "CREATE_BY", property = "createBy"),
             @Result(column = "UPDATE_BY", property = "updateBy")
     })
     List<ConfProductFormatDTO> findByPage(@Param("startNum") int startNum, @Param("pageSize") int pageSize);
 
-    @Insert("INSERT INTO CONF_PRODUCT_FORMAT( ID, FORMAT_ID, FORMAT_CODE, FORMAT_LENGTH, FORMAT_WIDTH, FORMAT_HEIGHT, FORMAT_WEIGHT, STATE, CREATE_TIME, CREATE_BY, UPDATE_TIME, UPDATE_BY) " +
-            "VALUES(#{id}, #{formatId}, #{formatCode}, #{formatLength}, #{formatWidth}, #{formatHeight}, #{formatWeight}, #{state}, #{createTime}, #{createBy}, #{updateTime}, #{updateBy})")
+    @Select("SELECT MAX(FORMAT_ID)+1 FROM CONF_PRODUCT_FORMAT")
+    int findNextFormatId();
+
+    @Insert("INSERT INTO CONF_PRODUCT_FORMAT( ID, FORMAT_ID, FORMAT_CODE, FORMAT_LENGTH, FORMAT_WIDTH, FORMAT_HEIGHT, FORMAT_WEIGHT, FORMAT_MEMO, STATE, CREATE_TIME, CREATE_BY, UPDATE_TIME, UPDATE_BY) " +
+            "VALUES(#{id}, #{formatId}, #{formatCode}, #{formatLength}, #{formatWidth}, #{formatHeight}, #{formatWeight}, #{formatMemo}, #{state}, #{createTime}, #{createBy}, #{updateTime}, #{updateBy})")
     int insert(ConfProductFormatDTO confProductFormatDTO);
 
 }

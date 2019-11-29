@@ -6,7 +6,7 @@ import lombok.EqualsAndHashCode;
 /**
  * @author mario1oreo
  *
- * @date 2019-11-13
+ * @date 2019-11-18
  */
 
 @EqualsAndHashCode(callSuper = false)
@@ -33,5 +33,9 @@ public class ConfProductSizeDTO extends BaseDTO {
      * 尺码类型  鞋子 欧码
      */
     private String formatSizeClass;
+    /**
+     * 尺寸信息备注说明
+     */
+    private String formatSizeMemo;
 
 }

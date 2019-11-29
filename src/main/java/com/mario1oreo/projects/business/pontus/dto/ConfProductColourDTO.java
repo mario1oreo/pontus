@@ -6,7 +6,7 @@ import lombok.EqualsAndHashCode;
 /**
  * @author mario1oreo
  *
- * @date 2019-11-13
+ * @date 2019-11-18
  */
 
 @EqualsAndHashCode(callSuper = false)
@@ -33,5 +33,9 @@ public class ConfProductColourDTO extends BaseDTO {
      * 颜色类别 英文命名
      */
     private String formatColourClass;
+    /**
+     * 颜色信息备注说明
+     */
+    private String formatColourMemo;
 
 }

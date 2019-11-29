@@ -3,32 +3,30 @@ package com.mario1oreo.projects.business.pontus.dto;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-/**
- * @author mario1oreo
- *
- * @date 2019-11-20
- */
-
 @EqualsAndHashCode(callSuper = false)
 @Data
-public class PrdProductInfoDTO extends BaseDTO {
+public class AddGoodsBO extends BaseDTO {
 
-    /**
-     * ID
-     */
-    private int id;
-    /**
-     * 条形码
-     */
-    private String barCode;
     /**
      * 商品ID
      */
     private String productId;
     /**
+     * 条形码
+     */
+    private String barCode;
+    /**
      * 商品名称
      */
     private String productName;
+    /**
+     * 商品数量
+     */
+    private java.math.BigDecimal productQuantity;
+    /**
+     * 产品度量单位
+     */
+    private String productUnit;
     /**
      * 商品类别:一级
      */
@@ -46,10 +44,6 @@ public class PrdProductInfoDTO extends BaseDTO {
      */
     private String productCategoryFor;
     /**
-     * 商品描述信息
-     */
-    private String description;
-    /**
      * 产品颜色
      */
     private int formatColourId;
@@ -61,5 +55,22 @@ public class PrdProductInfoDTO extends BaseDTO {
      * 产品规格
      */
     private int formatId;
+    /**
+     * 采购价格
+     */
+    private java.math.BigDecimal buyPrice;
+    /**
+     * 出售价格
+     */
+    private java.math.BigDecimal salePrice;
+    /**
+     * 成本价格
+     */
+    private java.math.BigDecimal costPrice;
+    /**
+     * 商品描述信息
+     */
+    private String description;
+
 
 }
