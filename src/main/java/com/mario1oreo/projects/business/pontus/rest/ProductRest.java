@@ -3,6 +3,7 @@ package com.mario1oreo.projects.business.pontus.rest;
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
@@ -325,4 +326,34 @@ public class ProductRest {
         log.info("queryGoodsInfoList currentPageNum:{}  pageSize:{}", current, pageSize);
         return productInfoServiceImpl.listGoodsInfo(current, pageSize);
     }
+
+    @RequestMapping("/queryGoodInfoByBarCode")
+    public ResultBO queryGoodInfoByBarCode(@RequestParam(defaultValue = "") String barCode) {
+        log.info("entry queryGoodInfoByBarCode  barCode:{}", barCode);
+
+        if (StrUtil.isBlank(barCode)) {
+            log.warn("barCode is blank, then return empty!");
+            return new ResultBO(false);
+        }
+        ResultBO goodInfo = new ResultBO();
+        StringBuilder paramBarCode = new StringBuilder();
+        if (barCode.contains("\n")) {
+            String[] barCodeArray = barCode.split("\n");
+            for (String barCodeEach : barCodeArray) {
+                if (StrUtil.isBlank(barCodeEach)) {
+                    continue;
+                }
+                paramBarCode.append("'").append(barCodeEach).append("',");
+            }
+            if (paramBarCode.toString().endsWith(",")) {
+                barCode = paramBarCode.toString().substring(0, paramBarCode.length() - 2);
+            }
+            //TODO 商品信息冗余设计  反范式化改造
+//            productInfoServiceImpl.listGoosInfoByBarCodes(barCode);
+        } else {
+//            productInfoServiceImpl.listGoodsInfoByBarCode(barCode);
+        }
+        return goodInfo;
+    }
+
 }

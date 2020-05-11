@@ -25,8 +25,13 @@ public class ResultBO {
     }
 
     public ResultBO(boolean failure) {
-        this.status = "FAILURE";
-        this.message = "失败";
+        if (failure) {
+            this.status = "SUCCESS";
+            this.message = "成功";
+        } else {
+            this.status = "FAILURE";
+            this.message = "失败";
+        }
         this.data = new DataBean();
     }
 

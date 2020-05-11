@@ -1,6 +1,5 @@
 package com.mario1oreo.projects.business.pontus.service.impl;
 
-import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
@@ -15,6 +14,7 @@ import com.mario1oreo.projects.business.pontus.dto.*;
 import com.mario1oreo.projects.business.pontus.service.ConfigInfoService;
 import com.mario1oreo.projects.business.pontus.service.ProductInfoService;
 import com.mario1oreo.projects.business.pontus.service.VoucherInfoService;
+import com.mario1oreo.projects.business.pontus.utils.tools.GenerateTools;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -91,6 +91,15 @@ public class ProductInfoServiceImpl implements ProductInfoService {
         } else {
             prdProductInfoDTO.setProductCategoryFor(StrUtil.EMPTY);
         }
+
+        List<ConfProductColourDTO> colourInfo = configInfoServiceImpl.getColourInfoCache();
+        List<ConfProductSizeDTO> sizeInfo = configInfoServiceImpl.getSizeInfoCache();
+        String currentColourCode = colourInfo.stream().filter(confProductColourDTO -> bo.getFormatColourId() == confProductColourDTO.getFormatColourId()).findFirst().get().getFormatColourCode();
+        String currentSizeCode = sizeInfo.stream().filter(confProductSizeDTO -> bo.getFormatSizeId() == confProductSizeDTO.getFormatSizeId()).findFirst().get().getFormatSizeCode();
+
+        productId.append(currentColourCode).append(StrUtil.UNDERLINE);
+        productId.append(currentSizeCode).append(StrUtil.UNDERLINE);
+
         productId.append(DateUtil.yearAndQuarter(DateUtil.date())).append(StrUtil.UNDERLINE);
         productId.append(RandomUtil.randomString(4));
         log.info("generate productId:{}", productId.toString());
@@ -98,6 +107,7 @@ public class ProductInfoServiceImpl implements ProductInfoService {
         log.info("setProductId:{}", productId.toString());
         prdProductInfoDTO.setProductId(productId.toString());
         confBarCodeDTO.setProductId(productId.toString());
+
 
         log.info("getFormatColourId:{}", bo.getFormatColourId());
         prdProductInfoDTO.setFormatColourId(bo.getFormatColourId());
@@ -158,16 +168,14 @@ public class ProductInfoServiceImpl implements ProductInfoService {
 
         PrdVoucherInfoDTO prdVoucherInfoDTO = new PrdVoucherInfoDTO();
 
-        StringBuilder voucherId = new StringBuilder();
-        voucherId.append(DateUtil.date().toString(DatePattern.PURE_DATETIME_PATTERN));
-        voucherId.append("ADDG").append(RandomUtil.randomNumbers(8));
-        log.info("voucherId:{}", voucherId.toString());
+        String voucherId = GenerateTools.generateAddGoodsVoucherID();
+        log.info("voucherId:{}", voucherId);
 
 
         log.info("translate AddGoodsBO to PrdInventoryChangingInfoDTO   start...");
         PrdInventoryChangingInfoDTO prdInventoryChangingInfoDTO = new PrdInventoryChangingInfoDTO();
 
-        prdInventoryChangingInfoDTO.setVoucherId(voucherId.toString());
+        prdInventoryChangingInfoDTO.setVoucherId(voucherId);
 
         log.info("getProductId:{}", prdInventoryInfoDTO.getProductId());
         prdInventoryChangingInfoDTO.setProductId(prdInventoryInfoDTO.getProductId());
